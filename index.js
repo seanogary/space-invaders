@@ -1,3 +1,50 @@
+const SPRITES= {
+    alien: {
+        A:[[0,0,1,0,0,0,1,0,0],[0,0,0,1,0,1,0,0,0],[0,0,1,1,1,1,1,0,0],[0,1,1,0,1,0,1,1,0],[1,1,1,1,1,1,1,1,1],[1,0,1,1,1,1,1,0,1],[1,0,1,0,0,0,1,0,1],[0,0,0,1,0,1,0,0,0]],
+        B: [
+            [0, 0, 1, 0, 0, 0, 1, 0, 0],
+            [1, 0, 0, 1, 0, 1, 0, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 0, 1],
+            [1, 1, 1, 0, 1, 0, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0, 0, 1, 0, 0],
+            [0, 1, 0, 0, 0, 0, 0, 1, 0]
+        ],
+    },
+    B:[[0,1,0,0,0,0,0,1,0],[1,0,1,0,0,0,1,0,1],[1,0,1,1,1,1,1,0,1],[1,1,1,0,1,0,1,1,1],[1,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,0],[0,0,1,0,0,0,1,0,0],[0,1,0,0,0,0,0,1,0]],
+  squid:{
+    A: [[0,0,0,1,1,0,0,0],[0,0,1,1,1,1,0,0],[0,1,1,1,1,1,1,0],[1,1,0,1,1,0,1,1],[1,1,1,1,1,1,1,1],[0,0,1,0,0,1,0,0],[0,1,0,1,1,0,1,0],[1,0,1,0,0,1,0,1]],
+    B: [
+        [0, 0, 0, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 0, 1, 1, 0, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 0, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0, 0, 0, 1],
+        [0, 1, 0, 0, 0, 0, 1, 0]
+    ],
+  },
+  bunker: [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+],
+};
 
 // create viewport, fixed aspect ratio and relative size set in CSS
 const viewport = document.createElement("div");
@@ -6,11 +53,11 @@ viewport.id = 'viewport'
 document.body.appendChild(viewport);
 
 const width = 800;
-const height = width * (3 / 4); // 600
-const pixelSize = 0.7
-console.log(pixelSize)
-const screen = Array.from({ length: 256 }, () =>
-  Array.from({ length: 224 }, () => [0, 0, 0])
+const height = width * (3 / 4); 
+const pixelSize = viewport.getBoundingClientRect().width / 112;
+console.log(pixelSize);
+const screen = Array.from({ length: 256 / 2 }, () =>
+  Array.from({ length: 224 / 2 }, () => [0, 0, 0])
 );
 
 const pixelator = (x, y, [r, g, b]) => {
@@ -23,6 +70,7 @@ const pixelator = (x, y, [r, g, b]) => {
     pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
     return pixel;
 }
+
 const equals = (a, b) => 
     a.length === b.length && 
     a.every((val, index) => val === b[index]);
@@ -36,10 +84,6 @@ function hexToSprite(bytes) {
   return bytes.map(hexToRow);
 }
 
-// Usage
-const squid = hexToSprite([0x00, 0x6C, 0xFE, 0xD6, 0xFE, 0x28, 0x6C, 0x00]);
-
-console.log(squid);
 
 const renderer = {
     drawPixels() {
@@ -55,7 +99,6 @@ const renderer = {
     updateScreen(x, y, sprite) {
         sprite.forEach((row, rel_y) =>
             row.forEach((val, rel_x) => 
-
                 this.addPixel(x + rel_x, y + rel_y, val == 1 ? [256, 256, 256] : [0,0,0])
     ));
     },
@@ -63,9 +106,18 @@ const renderer = {
     addPixel(x, y, color) {
         screen[x][y] = color;
     }
-
 }
 
-renderer.updateScreen(1, 1, squid)
 
+const squid1 = SPRITES.squid.B;
+const squid2 = SPRITES.squid.A;
+const alien1 = SPRITES.alien.A;
+const alien2 = SPRITES.alien.B;
+const bunker = SPRITES.bunker;
+renderer.updateScreen(50, 0, squid1)
+renderer.updateScreen(30, 0, squid2)
+renderer.updateScreen(50, 15, alien1)
+renderer.updateScreen(30, 15, alien2)
+renderer.updateScreen(30, 15, alien2)
+renderer.updateScreen(26, 30, bunker);
 renderer.drawPixels();
