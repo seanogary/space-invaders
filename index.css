@@ -1,4 +1,18 @@
 #viewport {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 7 / 8;
     width: 60%;
+}
+
+#screen {
+    position: relative;
+}
+
+#pixel {
+    position: absolute;
+    left: calc(var(--x) * 1px);
+    top: calc(var(--y) * 1px);
+}
+
+#viewport {
+  transform: rotate(90deg);
 }
