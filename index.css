@@ -1,9 +1,7 @@
 #viewport {
     aspect-ratio: 4 / 3;
-}
-
-#screen {
     position: relative;
+    overflow: hidden;
 }
 
 #pixel {
@@ -12,10 +10,6 @@
     top: calc(var(--y) * 1px);
 }
 
-#viewport {
-  transform: rotate(90deg);
-}
-
 body {
-    margin-top: 100px;
+    background-color: grey;
 }
