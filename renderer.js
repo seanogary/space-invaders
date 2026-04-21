@@ -1,4 +1,6 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT, PALETTE } from './constants.js';
+import { And, Or } from './booleans.js';
+import { SPRITES } from './sprites.js';
 
 let viewport;
 let pixelSize;
@@ -14,6 +16,8 @@ const pixelator = (x, y, [r, g, b]) => {
     pixel.style.width = pixelSize + "px";
     pixel.style.height = pixelSize + "px";
     pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    pixel.style.width  = (pixelSize + 1) + "px";
+    pixel.style.height = (pixelSize + 1) + "px";
     return pixel;
 }
 
@@ -30,6 +34,43 @@ export const renderer = {
         pixelSize = viewport.getBoundingClientRect().width / SCREEN_WIDTH;
     },
 
+    textWidth(text, size = 'large') {
+        const charWidth = size === 'small' ? 3 : size === 'medium' ? 5 : 8;
+        const spaceWidth = size === 'small' ? 2 : size === 'medium' ? 3 : 4;
+        let w = 0;
+        for (let i = 0; i < text.length; i++) {
+            const ch = text[i];
+            const last = i === text.length - 1;
+            if (ch === " ") {
+                w += spaceWidth;
+            } else {
+                w += charWidth + (last ? 0 : 1);
+            }
+        }
+        return w;
+    },
+    centerX(text, size = 'large') {
+        return Math.floor((SCREEN_WIDTH - this.textWidth(text, size)) / 2);
+    },
+    printScreen(x, y, text, size = 'large') {
+        const letterSet = size === 'small' ? SPRITES.lettersSmall
+            : size === 'medium' ? SPRITES.lettersMedium
+            : SPRITES.letters;
+        const numberSet = size === 'small' ? SPRITES.numbersSmall
+            : size === 'medium' ? SPRITES.numbersMedium
+            : SPRITES.numbers;
+        const spaceWidth = size === 'small' ? 2 : size === 'medium' ? 3 : 4;
+        for (const ch of text) {
+            if (ch === " ") {
+                x += spaceWidth;
+                continue;
+            }
+            const sprite = letterSet[ch] || numberSet[ch];
+            if (!sprite) continue;
+            this.updateScreen(x, y, sprite);
+            x += sprite[0].length + 1;
+        }
+    },
     clearScreen() {
         for (let row = 0; row < screen.length; row++) {
             for (let col = 0; col < screen[row].length; col++){
@@ -47,10 +88,10 @@ export const renderer = {
         );
         viewport.appendChild(fragment);
     },
-    updateScreen(x, y, sprite) {
+    updateScreen(x, y, sprite, color = PALETTE.white) {
         sprite.forEach((row, rel_y) =>
-            row.forEach((val, rel_x) => 
-                this.addPixel(x + rel_x, y + rel_y, val == 1 ? PALETTE.white : PALETTE.black)
+            row.forEach((val, rel_x) =>  
+                this.addPixel(x + rel_x, y + rel_y, val == 1 ? color : PALETTE.black)
     ));
     },
     addPixel(x, y, color) {
