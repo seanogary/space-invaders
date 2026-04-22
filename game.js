@@ -20,7 +20,7 @@ function gameLoop(timestamp) {
             frame++;
             renderer.clearScreen();
             entities.updateEntities(frame, renderer);
-            renderer.printScreen(renderer.centerX("SCORE: 0000", 'small'), 0, "SCORE: 0000", 'small');
+            renderer.printScreen(renderer.centerX("SCORE: 0000", 'small'), 0, "SCORE: 0000", renderer.screen, 'small');
             renderer.drawPixels();
     }
     }
@@ -30,8 +30,8 @@ function gameLoop(timestamp) {
 function mainMenu() {
     console.log("main menu");
     renderer.clearScreen();
-    renderer.printScreen(renderer.centerX("SPACE INVADERS", 'small'), 20, "SPACE INVADERS", 'small');
-    renderer.printScreen(renderer.centerX("PRESS ENTER TO START", 'small'), 40, "PRESS ENTER TO START", 'small');
+    renderer.printScreen(renderer.centerX("SPACE INVADERS", 'small'), 20, "SPACE INVADERS", renderer.screen, 'small');
+    renderer.printScreen(renderer.centerX("PRESS ENTER TO START", 'small'), 40, "PRESS ENTER TO START", renderer.screen, 'small');
     renderer.drawPixels();
     window.addEventListener('keydown', (e) => {
 

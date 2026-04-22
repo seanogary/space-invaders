@@ -4,9 +4,7 @@ import { SPRITES } from './sprites.js';
 
 let viewport;
 let pixelSize;
-const screen = Array.from({ length: SCREEN_HEIGHT }, () =>
-  Array.from({ length: SCREEN_WIDTH }, () => PALETTE.black)
-);
+
 
 const pixelator = (x, y, [r, g, b]) => {
     const pixel = document.createElement("div");
@@ -26,6 +24,12 @@ const equals = (a, b) =>
     a.every((val, index) => val === b[index]);
 
 export const renderer = {
+    screen: Array.from({ length: SCREEN_HEIGHT }, () =>
+        Array.from({ length: SCREEN_WIDTH }, () => PALETTE.black)
+),
+    enemyScreen: Array.from({ length: SCREEN_HEIGHT }, () =>
+  Array.from({ length: SCREEN_WIDTH }, () => 0)
+),
     init() {
         viewport = document.createElement("div");
         viewport.style.backgroundColor = "black";
@@ -52,7 +56,7 @@ export const renderer = {
     centerX(text, size = 'large') {
         return Math.floor((SCREEN_WIDTH - this.textWidth(text, size)) / 2);
     },
-    printScreen(x, y, text, size = 'large') {
+    printScreen(x, y, text, screen, size = 'large') {
         const letterSet = size === 'small' ? SPRITES.lettersSmall
             : size === 'medium' ? SPRITES.lettersMedium
             : SPRITES.letters;
@@ -67,36 +71,39 @@ export const renderer = {
             }
             const sprite = letterSet[ch] || numberSet[ch];
             if (!sprite) continue;
-            this.updateScreen(x, y, sprite);
+            this.updateScreen(x, y, sprite, screen, PALETTE.white);
             x += sprite[0].length + 1;
         }
     },
     clearScreen() {
-        for (let row = 0; row < screen.length; row++) {
-            for (let col = 0; col < screen[row].length; col++){
-                screen[row][col] = PALETTE.black;
+        for (let row = 0; row < this.screen.length; row++) {
+            for (let col = 0; col < this.screen[row].length; col++){
+                this.screen[row][col] = PALETTE.black;
+                this.enemyScreen[row][col] = 0;
             }
         }
         viewport.innerHTML = "";
     },
     drawPixels() {
         const fragment = document.createDocumentFragment();
-        screen.forEach((row, y) => 
+        this.screen.forEach((row, y) => 
             row.forEach((color, x) => 
                 !equals(color, PALETTE.black) && fragment.appendChild(pixelator(x, y, color))
             )
         );
         viewport.appendChild(fragment);
     },
-    updateScreen(x, y, sprite, color = PALETTE.white) {
+    updateScreen(x, y, sprite, screen, color = PALETTE.white) {
         sprite.forEach((row, rel_y) =>
-            row.forEach((val, rel_x) =>  
-                this.addPixel(x + rel_x, y + rel_y, val == 1 ? color : PALETTE.black)
+            row.forEach((val, rel_x) => {
+                if (val === 0) return;
+                this.addPixel(x + rel_x, y + rel_y, val == 1 ? color : PALETTE.black, screen)
+            } 
     ));
     },
-    addPixel(x, y, color) {
+    addPixel(x, y, color, screen) {
         if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT) {
-            screen[y][x] = color;
+            screen[y][x] = screen === this.enemyScreen ? 1 : color;
         }
     }
 }
