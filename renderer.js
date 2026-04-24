@@ -14,8 +14,6 @@ const pixelator = (x, y, [r, g, b]) => {
     pixel.style.width = pixelSize + "px";
     pixel.style.height = pixelSize + "px";
     pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-    pixel.style.width  = (pixelSize + 1) + "px";
-    pixel.style.height = (pixelSize + 1) + "px";
     return pixel;
 }
 
@@ -30,17 +28,23 @@ export const renderer = {
     enemyScreen: Array.from({ length: SCREEN_HEIGHT }, () =>
   Array.from({ length: SCREEN_WIDTH }, () => 0)
 ),
+
     init() {
         viewport = document.createElement("div");
         viewport.style.backgroundColor = "black";
         viewport.id = 'viewport'
         document.body.appendChild(viewport);
-        pixelSize = viewport.getBoundingClientRect().width / SCREEN_WIDTH;
+        pixelSize = Math.max(1, Math.floor(Math.min(
+            window.innerWidth / SCREEN_WIDTH,
+            window.innerHeight / SCREEN_HEIGHT
+        )));
+        viewport.style.width = (SCREEN_WIDTH * pixelSize) + "px";
+        viewport.style.height = (SCREEN_HEIGHT * pixelSize) + "px";
     },
 
     textWidth(text, size = 'large') {
-        const charWidth = size === 'small' ? 3 : size === 'medium' ? 5 : 8;
-        const spaceWidth = size === 'small' ? 2 : size === 'medium' ? 3 : 4;
+        const charWidth = size === 'small' ? 3 : size === 'medium' ? 5 : 6;
+        const spaceWidth = size === 'small' ? 2 : size === 'medium' ? 3 : 3;
         let w = 0;
         for (let i = 0; i < text.length; i++) {
             const ch = text[i];
@@ -56,6 +60,19 @@ export const renderer = {
     centerX(text, size = 'large') {
         return Math.floor((SCREEN_WIDTH - this.textWidth(text, size)) / 2);
     },
+    centerY(text, size = 'large') {
+        return Math.floor((SCREEN_HEIGHT - (size === 'small' ? 8 : size === 'medium' ? 12 : 16)) / 2);
+    },
+    rightJustifyX(text, size = 'large') {
+        return Math.floor(SCREEN_WIDTH - this.textWidth(text, size));
+    },
+
+    triggerSound(type, count) {
+        const sound = new Audio(`./sounds/fastinvader${count}.wav`);
+        console.log(`Playing sound: ${type}, ${count}`);
+        sound.play();
+    },
+
     printScreen(x, y, text, screen, size = 'large') {
         const letterSet = size === 'small' ? SPRITES.lettersSmall
             : size === 'medium' ? SPRITES.lettersMedium

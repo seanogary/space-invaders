@@ -22,15 +22,11 @@ export class Alien {
         return SPRITES[this.type][this.status.frame];
     }
     update(frameCount) {
-        if (!this.status.alive) return; 
-        if (frameCount % 30 === this.tempOffset) {
-            if (this.status.frame === 1) this.status.frame = 2;
-            else this.status.frame = 1;
-        }
-        if (frameCount % 5 === 0 ) {
-            this.x = (this.x + this.dx) % SCREEN_WIDTH;
-            this.y = (this.y + this.dy) % SCREEN_HEIGHT;
-        }
+        if (!this.status.alive) return;
+        if (this.status.frame === 1) this.status.frame = 2;
+        else this.status.frame = 1;
+        this.x = (this.x + this.dx) % SCREEN_WIDTH;
+        this.y = (this.y + this.dy) % SCREEN_HEIGHT;
     }
     draw(renderer) {
         if (!this.status.alive) return;
@@ -59,7 +55,7 @@ export class Bunker {
 
     constructor(x, y) {
         this.x = x;
-        this.y = 150;
+        this.y = 170;
         this.width = SPRITES.bunker.width;
         this.sprite = SPRITES.bunker.sprite;
     }
@@ -78,14 +74,13 @@ export class Bunker {
 }
 
 export class Player {
+
     constructor() {
         viewport = document.getElementById("viewport");
-        console.log(viewport);
         window.addEventListener("keydown", (e) => {
             switch (e.code) {
                 case "ArrowLeft":
                     this.dx = -1;
-                    console.log(this.x);
                     break;
                 case "ArrowRight":
                     this.dx = 1;
@@ -107,7 +102,7 @@ export class Player {
 
         this.dx = 0; // +1 (right), -1 (left)
         this.x = parseInt(SCREEN_WIDTH / 2 - SPRITES.player.width / 2);
-        this.y = parseInt(.8 * SCREEN_HEIGHT);
+        this.y = parseInt(.9 * SCREEN_HEIGHT);
     }
 
     draw(renderer) {
@@ -123,13 +118,31 @@ export const entities = {
     aliens: [],
     bunkers: [],
     player: [],
+    marchCursor: 0,
+    pendingReverse: false,
+    count: 1,
     updateEntities(frameCount, renderer) {
         for (const alien of this.aliens) {
             alien.draw(renderer);
         }
         this.checkEdges(renderer);
-        for (const alien of this.aliens) {
+
+        const alive = this.aliens
+            .filter(a => a.status.alive)
+            .sort((a, b) => b.y - a.y || a.x - b.x);
+        if (alive.length > 0) {
+            const alien = alive[this.marchCursor % alive.length];
             alien.update(frameCount);
+            this.marchCursor++;
+            if (this.marchCursor >= alive.length) {
+                renderer.triggerSound('march', this.count);
+                this.marchCursor = 0;
+                this.count = (this.count) % 4 + 1;
+                if (this.pendingReverse) {
+                    for (const a of alive) { a.dx = -a.dx; a.y += 1; }
+                    this.pendingReverse = false;
+                }
+            }
         }
 
         for (const bunker of this.bunkers) {
@@ -145,17 +158,9 @@ export const entities = {
         if (!this.aliens.length) return;
         const dx = this.aliens[0].dx;
         if (dx > 0 && And([renderer.enemyScreen, rightWall]).some(row => row.some(val => val > 0))) {
-            for (const alien of this.aliens) {
-                alien.dx = -1; 
-                alien.y += 1;
-            }
-            console.log("hit right wall");
+            this.pendingReverse = true;
         } else if (dx < 0 && And([renderer.enemyScreen, leftWall]).some(row => row.some(val => val > 0))) {
-            for (const alien of this.aliens) {
-                alien.dx = 1
-                alien.y += 1;
-            }
-            console.log("hit left wall");
+            this.pendingReverse = true;
         }
     },
 

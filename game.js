@@ -1,10 +1,11 @@
 import { renderer } from './renderer.js';
 import { entities, Alien, Bunker, Player } from './entities.js';
-import { SCREEN_WIDTH, SEPARATION, TICK_INTERVAL } from './constants.js';
+import { SCREEN_HEIGHT, SCREEN_WIDTH, SEPARATION, TICK_INTERVAL } from './constants.js';
 import { SPRITES } from './sprites.js';
+
 let lastTime = 0;
 let frame = 0;
-
+let count = 1;
 let playing = false;
 
 function gameLoop(timestamp) {
@@ -28,13 +29,19 @@ function gameLoop(timestamp) {
 }
 
 function mainMenu() {
-    console.log("main menu");
     renderer.clearScreen();
-    renderer.printScreen(renderer.centerX("SPACE INVADERS", 'small'), 20, "SPACE INVADERS", renderer.screen, 'small');
-    renderer.printScreen(renderer.centerX("PRESS ENTER TO START", 'small'), 40, "PRESS ENTER TO START", renderer.screen, 'small');
+    renderer.printScreen(
+        renderer.centerX("SPACE INVADERS", 'small'), 
+        renderer.centerY("SPACE INVADERS", 'small'),
+        "SPACE INVADERS", 
+        renderer.screen, 
+        'small'
+    );
+    renderer.printScreen(renderer.centerX("INSERT  COIN", 'small'), 40, "INSERT  COIN", renderer.screen, 'small');
+    renderer.printScreen(renderer.centerX("<1 OR 2  P L A Y E R S >", 'small'), 60, "<1 OR 2  PLAYERS>", renderer.screen, 'small');
+    renderer.printScreen(0, 224 - 5, "CREDIT 00", renderer.screen, 'small');
     renderer.drawPixels();
     window.addEventListener('keydown', (e) => {
-
         if (e.code === 'Enter') {
             playing = true;
         }
@@ -56,10 +63,10 @@ function spawnBunkers(num) {
     const CENTER = (SCREEN_WIDTH - SPRITES.bunker.width) / 2;
     const WIDTH = SPRITES.bunker.width; 
     console.log(CENTER);
-    entities.bunkers.push(new Bunker( parseInt(SCREEN_WIDTH / 5) - WIDTH / 2, 70));
-    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 2 / 5 - WIDTH / 2), 70));
-    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 3 / 5 ) - WIDTH / 2, 70));
-    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 4 / 5) - WIDTH / 2, 70));
+    entities.bunkers.push(new Bunker( parseInt(SCREEN_WIDTH / 5) - WIDTH / 2, 100));
+    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 2 / 5 - WIDTH / 2), 100));
+    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 3 / 5 ) - WIDTH / 2, 100));
+    entities.bunkers.push(new Bunker(parseInt(SCREEN_WIDTH * 4 / 5) - WIDTH / 2, 100));
 
 }
 
